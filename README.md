@@ -1,180 +1,201 @@
-# MCP JIRA Python 🚀
+# MCP Jira Python
 
-A Python implementation of a MCP server for JIRA integration. MCP is a communication protocol designed to provide tools to your AI and keep your data secure (and local if you like). The server runs on the same computer as your AI application and the Claude Desktop is the first application to run MCP Servers (and is considered a client. See the examples folder for a simple python MCP client).
+A Model Context Protocol (MCP) server implementation for Jira integration in Python. This server provides comprehensive Jira functionality through MCP tools, enabling AI assistants to interact with Jira instances seamlessly.
+
+## Features
+
+- **Issue Management**: Create, read, update, and delete Jira issues
+- **Comments & Attachments**: Add comments and manage file attachments
+- **Issue Linking**: Create relationships between issues
+- **Search & Discovery**: Search issues and retrieve metadata
+- **User Management**: Get user information and permissions
+- **Field Management**: List available fields and issue types
+
+## Available Tools
+
+### Issue Operations
+- `create_jira_issue` - Create new Jira issues
+- `get_issue` - Retrieve issue details by key
+- `update_issue` - Update existing issues
+- `delete_issue` - Delete issues
+- `search_issues` - Search issues using JQL
+
+### Comments & Attachments
+- `add_comment` - Add comments to issues
+- `add_comment_with_attachment` - Add comments with file attachments
+- `attach_file` - Attach files to issues
+- `attach_content` - Attach content as files to issues
+- `get_issue_attachment` - Retrieve issue attachments
+
+### Linking & Relationships
+- `create_issue_link` - Create links between issues
+- `list_link_types` - List available link types
+
+### Metadata & Discovery
+- `get_user` - Get user information
+- `list_fields` - List available Jira fields
+- `list_issue_types` - List available issue types
 
 ## Installation
 
+### Prerequisites
+- Python 3.13 or higher
+- Jira instance with API access
+- API token for authentication
+
+### Install Dependencies
+
 ```bash
-# Install the server locally
-git clone https://github.com/kallows/mcp-jira-python.git 
+pip install mcp>=1.2.1 jira
 ```
 
-## Tools Available
-
-This MCP server provides the following JIRA integration tools:
-
-- `delete_issue`: Delete a Jira issue or subtask using its issue key
-- `create_jira_issue`: Create a new Jira issue with customizable fields including summary, description, type, priority, and assignee
-- `get_issue`: Retrieve complete issue details including comments and attachments for a given issue key
-- `get_issue_attachment`: Download an attachment from a Jira issue to a local file
-- `create_issue_link`: Create relationships between issues (e.g., "blocks", "is blocked by", etc.)
-- `update_issue`: Update existing issues with new values for fields like summary, description, status, priority, or assignee
-- `get_user`: Look up a user's account ID using their email address
-- `list_fields`: Get a list of all available JIRA fields and their properties
-- `list_issue_types`: Retrieve all available issue types in your JIRA instance
-- `list_link_types`: Get all possible relationship types for issue linking
-- `search_issues`: Search for issues using JQL (JIRA Query Language) within a specific project
-- `add_comment`: Add a text comment to an existing issue
-- `add_comment_with_attachment`: Add a comment to an issue with an attached file
-- `attach_file`: Add a file attachment to an existing issue
-- `attach_content`: Create and attach content directly to a Jira issue (allows creating attachments from any text or data content)
-
-## Claude Desktop Configuration
-This requires you update claude_desktop_config.json. The file's location varies depending on Apple, Windows, or Linux.
- 
-### Windows
-Note: location of claude_desktop_config.json in Windows is:
+Or using uv:
+```bash
+uv add mcp>=1.2.1 jira
 ```
-%AppData%\\Claude\\claude_desktop_config.json
-```
-This will resolve (usually) to: 
-C:\\Users\\YOURUSERNAME\\AppData\\Roaming\\Claude
 
-Below is the configuration block to add to claude_desktop_config.json.
-With Windows we always use full paths. You will update "command", set your directory path, and add your JIRA env settings
-<pre>
-    "jira-api": {
-      "command": "C:\\\\Users\\\\YOURUSERNAME\\\\.local\\\\bin\\\\uv.exe",
-      "args": [
-        "--directory",
-        "D:\\\\mcp\\\\mcp-jira-python",
-        "run",
-        "-m",
-        "mcp_jira_python.server"
-      ],
-      "env": {
-        "JIRA_HOST": "YOURNAME.atlassian.net",
-        "JIRA_EMAIL": "yourname@example.com",
-        "JIRA_API_TOKEN": "YOURJIRATOKEN"
-      }      
-    }
-</pre>
-#### ☠️WARNING - you MUST close Claude Desktop AND kill all Claude processes to enable the updated claude_desktop_config.json!😬
+## Configuration
 
-### Mac and Linux
-Update the filepath to mcp-jira-python and fill in your JIRA env values:
-<pre>
-    "mcp-jira-python": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--directory", "/your/filepath/mcp-jira-python",
-        "-m", "mcp_jira_python.server"
-      ],
-      "env": {
-        "JIRA_HOST": "your_org.atlassian.net",
-        "JIRA_EMAIL": "you@your_org.com",
-        "JIRA_API_TOKEN": "your_api_token"
-      }      
-    }
-</pre>
+### Environment Variables
 
-#### Note:
-You must restart Claude Desktop after saving changes to claude_desktop_config.json.
-
-## Running MCP JIRA Python Tools
-These MCP Tools are listed under jira-api server. You can see the listing by clicking on the tiny hammer in the lower right corner of the Claude Desktop text entry box. Please verify that the jira-api tools are available in the list. To 'run' a tool, just ask Claude specifically to do a Jira task. Notably, Claude may not see the tools at first and has to be nudged. In some cases, he will refuse to use tools. Updating the system prompt is recommended.
-
-## Running Tests    
-
-The test suite provides comprehensive coverage of the MCP JIRA server functionality. To run tests, you need to set up environment variables for integration tests:
+Set the following environment variables:
 
 ```bash
 export JIRA_HOST="your-domain.atlassian.net"
 export JIRA_EMAIL="your-email@example.com"
 export JIRA_API_TOKEN="your-api-token"
-export JIRA_PROJECT_KEY="TEST"  # Project key for test issues
 ```
 
-Run the full test suite:
+### Getting a Jira API Token
+
+1. Go to [Atlassian Account Settings](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Click "Create API token"
+3. Give it a label and copy the generated token
+4. Use this token as your `JIRA_API_TOKEN`
+
+## Usage
+
+### Running the Server
+
 ```bash
-python -m unittest discover tests
+python -m mcp_jira_python.server
 ```
 
-Run specific test categories:
+Or using the installed script:
 ```bash
-# Integration tests
-python -m unittest tests/test_jira_mcp_integration.py
-
-# Unit tests for individual tools
-python -m unittest discover tests/unit_tests
-
-# Endpoint-specific tests
-python -m unittest discover tests/endpoint_tests
+jira-api
 ```
 
-Generate test coverage report:
+### MCP Client Integration
+
+Add to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "jira": {
+      "command": "python",
+      "args": ["-m", "mcp_jira_python.server"],
+      "env": {
+        "JIRA_HOST": "your-domain.atlassian.net",
+        "JIRA_EMAIL": "your-email@example.com",
+        "JIRA_API_TOKEN": "your-api-token"
+      }
+    }
+  }
+}
+```
+
+### Example Client Usage
+
+See `examples/client.py` for a complete example of how to use this MCP server with the Anthropic Claude API.
+
 ```bash
-python -m coverage run -m unittest discover tests
-python -m coverage report
+python examples/client.py path/to/server.py
 ```
 
-## Project Structure
+## Development
+
+### Project Structure
 
 ```
-mcp-jira-python/
-├── README.md
-├── LICENSE
-├── pyproject.toml
-├── uv.lock
-├── examples/
-│   └── client.py
-├── src/
-│   └── mcp_jira_python/
-│       ├── __init__.py
-│       ├── server.py
-│       └── tools/
-│           ├── __init__.py
-│           ├── base.py
-│           ├── add_comment.py
-│           ├── add_comment_with_attachment.py
-│           ├── attach_content.py
-│           ├── attach_file.py
-│           ├── create_issue.py
-│           ├── create_issue_link.py
-│           ├── delete_issue.py
-│           ├── get_issue.py
-│           ├── get_issue_attachment.py
-│           ├── get_user.py
-│           ├── list_fields.py
-│           ├── list_issue_types.py
-│           ├── list_link_types.py
-│           ├── search_issues.py
-│           └── update_issue.py
-└── tests/
+src/mcp_jira_python/
+├── __init__.py
+├── server.py              # Main MCP server implementation
+└── tools/                 # Individual tool implementations
     ├── __init__.py
-    ├── README.md
-    ├── conftest.py
-    ├── test_jira_connection.py
-    ├── test_jira_endpoints.py
-    ├── test_jira_mcp_integration.py
-    ├── test_jira_mcp_system.py
-    ├── test_integration.py
-    └── test_unit.py
-    ├── endpoint_tests/
-    │   ├── test_add_comment.py
-    │   ├── test_create_issue.py
-    │   ├── test_get_issue.py
-    │   └── test_update_issue.py
-    └── unit_tests/
-        ├── __init__.py
-        ├── test_base.py
-        ├── test_add_comment.py
-        ├── test_add_comment_with_attachment.py
-        ├── test_create_issue.py
-        ├── test_create_issue_link.py
-        ├── test_delete_issue.py
-        ├── test_get_issue.py
-        ├── test_search_issues.py
-        └── test_update_issue.py
+    ├── base.py            # Base tool class
+    ├── create_issue.py    # Issue creation
+    ├── get_issue.py       # Issue retrieval
+    ├── update_issue.py    # Issue updates
+    ├── delete_issue.py    # Issue deletion
+    ├── search_issues.py   # Issue search
+    ├── add_comment.py     # Comment management
+    ├── attach_file.py     # File attachments
+    └── ...                # Other tool implementations
 ```
+
+### Adding New Tools
+
+1. Create a new tool class inheriting from `BaseTool`
+2. Implement the required methods
+3. Add the tool to `tools/__init__.py`
+4. Register it in the `_TOOLS` dictionary
+
+### Testing
+
+```bash
+python -m pytest tests/
+```
+
+## Security Considerations
+
+- Store API tokens securely using environment variables
+- Use HTTPS for all Jira communications
+- Implement proper error handling for sensitive operations
+- Consider rate limiting for production deployments
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+This project is licensed under the terms specified in the LICENSE file.
+
+## Troubleshooting
+
+### Common Issues
+
+**Authentication Errors**
+- Verify your API token is correct and hasn't expired
+- Ensure your email matches your Atlassian account
+- Check that your Jira host URL is correct
+
+**Connection Issues**
+- Verify network connectivity to your Jira instance
+- Check firewall settings
+- Ensure HTTPS is properly configured
+
+**Tool Execution Errors**
+- Check that required fields are provided
+- Verify user permissions for the requested operations
+- Review Jira logs for detailed error information
+
+### Debug Mode
+
+Set environment variable for detailed logging:
+```bash
+export MCP_LOG_LEVEL=DEBUG
+```
+
+## Support
+
+For issues and questions:
+- Check the existing issues in the repository
+- Review Jira API documentation
+- Consult MCP protocol specifications
